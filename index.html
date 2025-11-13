@@ -58,6 +58,72 @@
             transition: background 0.5s ease;
             overflow-x: hidden;
             touch-action: manipulation;
+            position: relative;
+        }
+
+        /* Animated Gears Background */
+        .gear-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        .gear {
+            position: absolute;
+            color: var(--text-color);
+            opacity: 0.3;
+            animation: rotateGear linear infinite;
+        }
+
+        .gear-1 {
+            top: 10%;
+            left: 10%;
+            font-size: 80px;
+            animation-duration: 30s;
+        }
+
+        .gear-2 {
+            top: 70%;
+            right: 15%;
+            font-size: 60px;
+            animation-duration: 25s;
+            animation-direction: reverse;
+        }
+
+        .gear-3 {
+            bottom: 20%;
+            left: 20%;
+            font-size: 40px;
+            animation-duration: 20s;
+        }
+
+        .gear-4 {
+            top: 30%;
+            right: 25%;
+            font-size: 50px;
+            animation-duration: 35s;
+            animation-direction: reverse;
+        }
+
+        .gear-5 {
+            top: 60%;
+            left: 5%;
+            font-size: 70px;
+            animation-duration: 40s;
+        }
+
+        @keyframes rotateGear {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes gradientBG {
@@ -832,6 +898,36 @@
             opacity: 0.8;
         }
         
+        /* File Upload Styles */
+        .file-upload-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--item-bg);
+            border-radius: 12px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .file-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .file-input {
+            flex: 1;
+        }
+        
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
         /* Mobile-specific improvements */
         @media (max-width: 480px) {
             .container {
@@ -903,6 +999,12 @@
                 width: 60px;
                 height: 60px;
             }
+            
+            .gear-1 { font-size: 60px; }
+            .gear-2 { font-size: 45px; }
+            .gear-3 { font-size: 30px; }
+            .gear-4 { font-size: 40px; }
+            .gear-5 { font-size: 50px; }
         }
         
         @media (max-width: 360px) {
@@ -939,6 +1041,15 @@
     </style>
 </head>
 <body class="dark-theme">
+
+    <!-- Animated Gears Background -->
+    <div class="gear-background">
+        <div class="gear gear-1"><i class="fas fa-cog"></i></div>
+        <div class="gear gear-2"><i class="fas fa-cog"></i></div>
+        <div class="gear gear-3"><i class="fas fa-cog"></i></div>
+        <div class="gear gear-4"><i class="fas fa-cog"></i></div>
+        <div class="gear gear-5"><i class="fas fa-cog"></i></div>
+    </div>
 
     <div class="container">
         <div class="theme-toggle" id="theme-toggle">
@@ -1029,8 +1140,22 @@
                         <option value="sound1">Beep Tone</option>
                         <option value="sound2">Bell Ring</option>
                         <option value="sound3">Digital Tone</option>
+                        <option value="custom">Custom Sound</option>
                     </select>
                 </div>
+                
+                <!-- Custom Music Upload -->
+                <div class="file-upload-container" id="custom-sound-upload" style="display: none;">
+                    <label class="file-upload-label">Upload Custom Alarm Sound</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="custom-alarm-file" class="form-control file-input" accept="audio/*">
+                        <button type="button" class="btn" onclick="document.getElementById('custom-alarm-file').click()">
+                            <i class="fas fa-upload"></i> Browse
+                        </button>
+                    </div>
+                    <div class="file-name" id="custom-file-name">No file selected</div>
+                </div>
+                
                 <button type="submit" class="btn" id="set-alarm-btn">
                     <i class="fas fa-plus-circle"></i> Set Alarm
                 </button>
@@ -1125,11 +1250,19 @@
                         <option value="sound1">Beep Tone</option>
                         <option value="sound2">Bell Ring</option>
                         <option value="sound3">Digital Tone</option>
+                        <option value="custom">Custom Sound</option>
                     </select>
                 </div>
                 <div class="setting-item">
                     <span>Volume</span>
                     <input type="range" id="volume-slider" min="0" max="100" value="80" class="form-control" style="width: 150px;">
+                </div>
+                <div class="setting-item">
+                    <span>Voice Alerts</span>
+                    <label class="switch">
+                        <input type="checkbox" id="voice-alerts" checked>
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -1139,6 +1272,7 @@
         <div class="alarm-modal-content">
             <h2 id="modal-label">Alarm!</h2>
             <div id="modal-time">00:00 AM</div>
+            <div id="modal-voice-message" style="margin-bottom: 1.5rem; font-style: italic;"></div>
             <button class="btn btn-danger" onclick="stopAlarm()">
                 <i class="fas fa-stop"></i> Stop Alarm
             </button>
@@ -1159,6 +1293,7 @@
     <audio id="sound3" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/259/259-preview.mp3" type="audio/mp3">
     </audio>
+    <audio id="custom-sound" preload="auto" loop></audio>
     <audio id="notification-sound" preload="auto">
         <source src="https://assets.mixkit.co/active_storage/sfx/250/250-preview.mp3" type="audio/mp3">
     </audio>
@@ -1167,9 +1302,10 @@
     </audio>
 
     <script>
-        const ALARMS_LS_KEY = 'smart_clock_alarms_v5';
-        const TIMERS_LS_KEY = 'smart_clock_timers_v5';
-        const SETTINGS_LS_KEY = 'smart_clock_settings_v5';
+        const ALARMS_LS_KEY = 'smart_clock_alarms_v6';
+        const TIMERS_LS_KEY = 'smart_clock_timers_v6';
+        const SETTINGS_LS_KEY = 'smart_clock_settings_v6';
+        const CUSTOM_SOUND_LS_KEY = 'smart_clock_custom_sound_v1';
         
         let alarms = [];
         let timers = [];
@@ -1177,10 +1313,12 @@
             autoTheme: true,
             hourFormat: false,
             defaultAlarmSound: 'sound1',
-            volume: 80
+            volume: 80,
+            voiceAlerts: true
         };
         let activeAlarmSound = null;
         let activeTab = 'Clock';
+        let customAlarmFile = null;
         
         // Stopwatch variables
         let stopwatchInterval = null;
@@ -1204,6 +1342,7 @@
         
         const NOTIFICATION_SOUND = document.getElementById('notification-sound');
         const TIMER_END_SOUND = document.getElementById('timer-end-sound');
+        const CUSTOM_SOUND = document.getElementById('custom-sound');
         
         document.addEventListener('DOMContentLoaded', () => {
             loadFromLocalStorage();
@@ -1232,6 +1371,7 @@
             document.getElementById('hour-format').addEventListener('change', updateSettings);
             document.getElementById('default-alarm-sound').addEventListener('change', updateSettings);
             document.getElementById('volume-slider').addEventListener('input', updateSettings);
+            document.getElementById('voice-alerts').addEventListener('change', updateSettings);
             
             // Theme toggle
             document.getElementById('theme-toggle').addEventListener('click', toggleManualTheme);
@@ -1239,6 +1379,13 @@
             // Voice control
             initializeVoiceRecognition();
             document.getElementById('voice-btn').addEventListener('click', toggleVoiceRecognition);
+            
+            // Custom sound upload
+            document.getElementById('alarm-sound-select').addEventListener('change', toggleCustomSoundUpload);
+            document.getElementById('custom-alarm-file').addEventListener('change', handleCustomSoundUpload);
+            
+            // Load custom sound if exists
+            loadCustomSound();
             
             // Prevent default touch behaviors
             document.addEventListener('touchstart', function(e) {
@@ -1287,6 +1434,7 @@
             document.getElementById('hour-format').checked = settings.hourFormat;
             document.getElementById('default-alarm-sound').value = settings.defaultAlarmSound;
             document.getElementById('volume-slider').value = settings.volume;
+            document.getElementById('voice-alerts').checked = settings.voiceAlerts;
             
             // Update all audio elements volume
             updateAudioVolume();
@@ -1297,6 +1445,7 @@
             settings.hourFormat = document.getElementById('hour-format').checked;
             settings.defaultAlarmSound = document.getElementById('default-alarm-sound').value;
             settings.volume = document.getElementById('volume-slider').value;
+            settings.voiceAlerts = document.getElementById('voice-alerts').checked;
             
             updateAudioVolume();
             saveToLocalStorage();
@@ -1468,6 +1617,9 @@
             });
             document.getElementById('set-alarm-btn').innerHTML = '<i class="fas fa-save"></i> Update Alarm';
             
+            // Show/hide custom sound upload based on selection
+            toggleCustomSoundUpload();
+            
             // Scroll to form
             document.getElementById('alarm-form').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1485,6 +1637,7 @@
             document.getElementById('alarm-form').reset();
             document.getElementById('alarm-id').value = '';
             document.getElementById('set-alarm-btn').innerHTML = '<i class="fas fa-plus-circle"></i> Set Alarm';
+            document.getElementById('custom-sound-upload').style.display = 'none';
         }
 
         function checkAlarms() {
@@ -1511,8 +1664,13 @@
             document.getElementById('modal-time').textContent = `${String(alarm.hour).padStart(2,'0')}:${String(alarm.minute).padStart(2,'0')} ${alarm.ampm}`;
             document.getElementById('alarm-modal').classList.add('active');
             
-            // Play the alarm sound
-            playAlarmSound(alarm.sound);
+            // Play voice alert if enabled
+            if (settings.voiceAlerts) {
+                playVoiceAlert(alarm);
+            } else {
+                // If voice alerts are disabled, directly play the alarm sound
+                playAlarmSound(alarm.sound);
+            }
             
             // Vibrate if supported
             if (navigator.vibrate) {
@@ -1520,8 +1678,48 @@
             }
         }
         
+        function playVoiceAlert(alarm) {
+            const weatherWidget = document.getElementById('weather-widget');
+            const temp = weatherWidget.querySelector('.weather-temp').textContent;
+            const desc = weatherWidget.querySelector('.weather-desc').textContent;
+            
+            // Create greeting based on time of day
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = "Good morning";
+            if (hour >= 12 && hour < 17) {
+                greeting = "Good afternoon";
+            } else if (hour >= 17) {
+                greeting = "Good evening";
+            }
+            
+            const message = `${greeting}. It's time for ${alarm.label}. Today's weather is ${desc.toLowerCase()} with a temperature of ${temp}.`;
+            
+            document.getElementById('modal-voice-message').textContent = message;
+            
+            // Use speech synthesis to speak the message
+            const speech = new SpeechSynthesisUtterance();
+            speech.text = message;
+            speech.volume = settings.volume / 100;
+            speech.rate = 1;
+            speech.pitch = 1;
+            
+            speech.onend = function() {
+                // After voice alert finishes, play the alarm sound
+                playAlarmSound(alarm.sound);
+            };
+            
+            window.speechSynthesis.speak(speech);
+        }
+        
         function playAlarmSound(soundId) {
-            const sound = document.getElementById(soundId);
+            let sound;
+            if (soundId === 'custom') {
+                sound = CUSTOM_SOUND;
+            } else {
+                sound = document.getElementById(soundId);
+            }
+            
             if (sound) {
                 activeAlarmSound = sound;
                 sound.currentTime = 0;
@@ -1544,11 +1742,66 @@
                 activeAlarmSound.pause();
                 activeAlarmSound.currentTime = 0;
             }
+            
+            // Stop any ongoing speech
+            window.speechSynthesis.cancel();
+            
             document.getElementById('alarm-modal').classList.remove('active');
             
             // Stop vibration
             if (navigator.vibrate) {
                 navigator.vibrate(0);
+            }
+        }
+
+        // --- CUSTOM SOUND UPLOAD FUNCTIONS ---
+        function toggleCustomSoundUpload() {
+            const soundSelect = document.getElementById('alarm-sound-select');
+            const customUpload = document.getElementById('custom-sound-upload');
+            
+            if (soundSelect.value === 'custom') {
+                customUpload.style.display = 'block';
+            } else {
+                customUpload.style.display = 'none';
+            }
+        }
+        
+        function handleCustomSoundUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check if file is an audio file
+                if (!file.type.startsWith('audio/')) {
+                    showNotification('Please select an audio file', 'error');
+                    return;
+                }
+                
+                // Check file size (limit to 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File size should be less than 5MB', 'error');
+                    return;
+                }
+                
+                document.getElementById('custom-file-name').textContent = file.name;
+                
+                // Create a URL for the file and set it as the custom sound source
+                const fileURL = URL.createObjectURL(file);
+                CUSTOM_SOUND.src = fileURL;
+                
+                // Store the file in localStorage (as base64)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem(CUSTOM_SOUND_LS_KEY, e.target.result);
+                    showNotification('Custom alarm sound uploaded successfully');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function loadCustomSound() {
+            const customSoundData = localStorage.getItem(CUSTOM_SOUND_LS_KEY);
+            if (customSoundData) {
+                CUSTOM_SOUND.src = customSoundData;
+                document.getElementById('custom-file-name').textContent = 'Custom sound loaded';
             }
         }
 
