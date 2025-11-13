@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Clock Pro - Mobile</title>
+    <title>Smart Clock Pro - Enhanced</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -735,6 +735,103 @@
             transform: translateX(26px);
         }
         
+        /* Voice Control Styles */
+        .voice-control-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .voice-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn.listening {
+            background: var(--danger-color);
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .voice-status {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: var(--item-bg);
+            border-radius: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* World Clock Styles */
+        .world-clock-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        
+        .world-clock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--item-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .world-clock-city {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .world-clock-time {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+        
+        /* Quote Section */
+        .quote-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--item-bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+            text-align: center;
+        }
+        
+        .quote-text {
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quote-author {
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        
         /* Mobile-specific improvements */
         @media (max-width: 480px) {
             .container {
@@ -801,6 +898,11 @@
             #modal-time {
                 font-size: 2.5rem;
             }
+            
+            .voice-btn {
+                width: 60px;
+                height: 60px;
+            }
         }
         
         @media (max-width: 360px) {
@@ -860,6 +962,12 @@
             <button class="tab-button" data-tab="Stopwatch" onclick="openTab(event, 'Stopwatch')">
                 <i class="fas fa-stopwatch"></i> <span>Stopwatch</span>
             </button>
+            <button class="tab-button" data-tab="WorldClock" onclick="openTab(event, 'WorldClock')">
+                <i class="fas fa-globe"></i> <span>World</span>
+            </button>
+            <button class="tab-button" data-tab="VoiceControl" onclick="openTab(event, 'VoiceControl')">
+                <i class="fas fa-microphone"></i> <span>Voice</span>
+            </button>
             <button class="tab-button" data-tab="Settings" onclick="openTab(event, 'Settings')">
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </button>
@@ -880,6 +988,10 @@
                         <div class="weather-temp">--°C</div>
                         <div class="weather-desc">Loading...</div>
                     </div>
+                </div>
+                <div class="quote-section" id="quote-section">
+                    <div class="quote-text" id="quote-text">Loading quote...</div>
+                    <div class="quote-author" id="quote-author"></div>
                 </div>
             </div>
         </div>
@@ -959,6 +1071,37 @@
             <div class="lap-list" id="lap-list"></div>
         </div>
         
+        <div id="WorldClock" class="tab-content">
+            <h2><i class="fas fa-globe"></i> World Clock</h2>
+            <div id="world-clock-list" class="world-clock-list">
+                <!-- World clocks will be populated here -->
+            </div>
+        </div>
+        
+        <div id="VoiceControl" class="tab-content">
+            <h2><i class="fas fa-microphone"></i> Voice Control</h2>
+            <div class="voice-control-container">
+                <button class="voice-btn" id="voice-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div class="voice-status" id="voice-status">
+                    Click the microphone and speak a command
+                </div>
+                <div style="margin-top: 1.5rem; text-align: left;">
+                    <h3>Available Commands:</h3>
+                    <ul style="padding-left: 1.2rem;">
+                        <li>"Set alarm for [time]" - e.g., "Set alarm for 7 AM"</li>
+                        <li>"Start stopwatch"</li>
+                        <li>"Stop stopwatch"</li>
+                        <li>"Reset stopwatch"</li>
+                        <li>"Set timer for [duration]" - e.g., "Set timer for 5 minutes"</li>
+                        <li>"Show world clock"</li>
+                        <li>"Show alarms"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
         <div id="Settings" class="tab-content">
             <h2><i class="fas fa-cog"></i> Settings</h2>
             <div class="settings-panel">
@@ -1007,13 +1150,13 @@
     </div>
 
     <!-- Audio elements with direct links to working sound files -->
-    <audio id="sound1" preload="auto">
+    <audio id="sound1" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/257/257-preview.mp3" type="audio/mp3">
     </audio>
-    <audio id="sound2" preload="auto">
+    <audio id="sound2" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/250/250-preview.mp3" type="audio/mp3">
     </audio>
-    <audio id="sound3" preload="auto">
+    <audio id="sound3" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/259/259-preview.mp3" type="audio/mp3">
     </audio>
     <audio id="notification-sound" preload="auto">
@@ -1024,9 +1167,9 @@
     </audio>
 
     <script>
-        const ALARMS_LS_KEY = 'smart_clock_alarms_v4';
-        const TIMERS_LS_KEY = 'smart_clock_timers_v4';
-        const SETTINGS_LS_KEY = 'smart_clock_settings_v4';
+        const ALARMS_LS_KEY = 'smart_clock_alarms_v5';
+        const TIMERS_LS_KEY = 'smart_clock_timers_v5';
+        const SETTINGS_LS_KEY = 'smart_clock_settings_v5';
         
         let alarms = [];
         let timers = [];
@@ -1045,6 +1188,20 @@
         let stopwatchRunning = false;
         let laps = [];
         
+        // Voice recognition
+        let recognition = null;
+        let isListening = false;
+        
+        // World clocks
+        const worldClocks = [
+            { city: 'Dhaka', timezone: 'Asia/Dhaka' },
+            { city: 'London', timezone: 'Europe/London' },
+            { city: 'New York', timezone: 'America/New_York' },
+            { city: 'Tokyo', timezone: 'Asia/Tokyo' },
+            { city: 'Dubai', timezone: 'Asia/Dubai' },
+            { city: 'Sydney', timezone: 'Australia/Sydney' }
+        ];
+        
         const NOTIFICATION_SOUND = document.getElementById('notification-sound');
         const TIMER_END_SOUND = document.getElementById('timer-end-sound');
         
@@ -1057,8 +1214,10 @@
             setInterval(updateClockAndTheme, 1000);
             setInterval(checkAlarms, 1000);
             setInterval(updateAllTimers, 1000);
+            setInterval(updateWorldClocks, 1000);
             updateWeather();
             setInterval(updateWeather, 600000); // Update weather every 10 minutes
+            loadRandomQuote();
             
             // Preload all audio elements to ensure they work
             preloadAudioElements();
@@ -1076,6 +1235,10 @@
             
             // Theme toggle
             document.getElementById('theme-toggle').addEventListener('click', toggleManualTheme);
+            
+            // Voice control
+            initializeVoiceRecognition();
+            document.getElementById('voice-btn').addEventListener('click', toggleVoiceRecognition);
             
             // Prevent default touch behaviors
             document.addEventListener('touchstart', function(e) {
@@ -1173,6 +1336,11 @@
             activeContent.style.animation = null; 
             
             activeTab = tabName;
+            
+            // If opening World Clock tab, update it
+            if (tabName === 'WorldClock') {
+                updateWorldClocks();
+            }
         }
 
         function updateClockAndTheme() {
@@ -1612,6 +1780,189 @@
                 descElement.textContent = randomCondition.desc;
                 iconElement.className = `fas ${randomCondition.icon} weather-icon`;
             }, 1000);
+        }
+        
+        // --- QUOTE FUNCTIONS ---
+        function loadRandomQuote() {
+            // Using a free quotes API
+            fetch('https://api.quotable.io/random')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('quote-text').textContent = `"${data.content}"`;
+                    document.getElementById('quote-author').textContent = `- ${data.author}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching quote:', error);
+                    document.getElementById('quote-text').textContent = '"The only way to do great work is to love what you do."';
+                    document.getElementById('quote-author').textContent = '- Steve Jobs';
+                });
+        }
+        
+        // --- WORLD CLOCK FUNCTIONS ---
+        function updateWorldClocks() {
+            const list = document.getElementById('world-clock-list');
+            list.innerHTML = '';
+            
+            worldClocks.forEach(clock => {
+                const now = new Date();
+                const options = { 
+                    timeZone: clock.timezone, 
+                    hour12: !settings.hourFormat,
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit'
+                };
+                
+                const timeString = now.toLocaleTimeString('en-US', options);
+                
+                list.innerHTML += `
+                    <div class="world-clock-item">
+                        <div class="world-clock-city">${clock.city}</div>
+                        <div class="world-clock-time">${timeString}</div>
+                    </div>`;
+            });
+        }
+        
+        // --- VOICE CONTROL FUNCTIONS ---
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onstart = function() {
+                    isListening = true;
+                    document.getElementById('voice-btn').classList.add('listening');
+                    document.getElementById('voice-status').textContent = 'Listening... Speak now';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    document.getElementById('voice-status').textContent = `You said: "${transcript}"`;
+                    processVoiceCommand(transcript);
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error', event.error);
+                    document.getElementById('voice-status').textContent = `Error: ${event.error}. Try again.`;
+                    stopVoiceRecognition();
+                };
+                
+                recognition.onend = function() {
+                    stopVoiceRecognition();
+                };
+            } else {
+                document.getElementById('voice-status').textContent = 'Speech recognition not supported in this browser';
+                document.getElementById('voice-btn').style.display = 'none';
+            }
+        }
+        
+        function toggleVoiceRecognition() {
+            if (isListening) {
+                stopVoiceRecognition();
+            } else {
+                startVoiceRecognition();
+            }
+        }
+        
+        function startVoiceRecognition() {
+            if (recognition) {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                }
+            }
+        }
+        
+        function stopVoiceRecognition() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isListening = false;
+            document.getElementById('voice-btn').classList.remove('listening');
+            if (document.getElementById('voice-status').textContent === 'Listening... Speak now') {
+                document.getElementById('voice-status').textContent = 'Click the microphone and speak a command';
+            }
+        }
+        
+        function processVoiceCommand(transcript) {
+            showNotification(`Voice command: "${transcript}"`);
+            
+            // Alarm commands
+            if (transcript.includes('set alarm')) {
+                const timeMatch = transcript.match(/(\d+)(?::(\d+))?\s*(am|pm)?/i);
+                if (timeMatch) {
+                    let hour = parseInt(timeMatch[1]);
+                    const minute = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
+                    let ampm = timeMatch[3] ? timeMatch[3].toUpperCase() : 'AM';
+                    
+                    // Convert to 12-hour format if needed
+                    if (hour > 12) {
+                        hour = hour % 12;
+                        ampm = 'PM';
+                    }
+                    
+                    document.getElementById('alarm-hour').value = hour;
+                    document.getElementById('alarm-minute').value = minute;
+                    document.getElementById('alarm-ampm').value = ampm;
+                    
+                    openTab({currentTarget: document.querySelector('[data-tab="Alarm"]')}, 'Alarm');
+                    showNotification(`Alarm set for ${hour}:${minute.toString().padStart(2, '0')} ${ampm}`);
+                }
+            }
+            
+            // Stopwatch commands
+            else if (transcript.includes('start stopwatch')) {
+                if (!stopwatchRunning) {
+                    toggleStopwatch();
+                    showNotification('Stopwatch started');
+                }
+            }
+            else if (transcript.includes('stop stopwatch') || transcript.includes('pause stopwatch')) {
+                if (stopwatchRunning) {
+                    toggleStopwatch();
+                    showNotification('Stopwatch paused');
+                }
+            }
+            else if (transcript.includes('reset stopwatch')) {
+                resetStopwatch();
+                showNotification('Stopwatch reset');
+            }
+            
+            // Timer commands
+            else if (transcript.includes('set timer')) {
+                const minuteMatch = transcript.match(/(\d+)\s*minute/);
+                const secondMatch = transcript.match(/(\d+)\s*second/);
+                
+                const minutes = minuteMatch ? parseInt(minuteMatch[1]) : 0;
+                const seconds = secondMatch ? parseInt(secondMatch[1]) : 0;
+                
+                if (minutes > 0 || seconds > 0) {
+                    document.getElementById('timer-minutes').value = minutes;
+                    document.getElementById('timer-seconds').value = seconds;
+                    
+                    openTab({currentTarget: document.querySelector('[data-tab="Timer"]')}, 'Timer');
+                    showNotification(`Timer set for ${minutes} minutes and ${seconds} seconds`);
+                }
+            }
+            
+            // Navigation commands
+            else if (transcript.includes('show world clock') || transcript.includes('world clock')) {
+                openTab({currentTarget: document.querySelector('[data-tab="WorldClock"]')}, 'WorldClock');
+            }
+            else if (transcript.includes('show alarm') || transcript.includes('alarms')) {
+                openTab({currentTarget: document.querySelector('[data-tab="Alarm"]')}, 'Alarm');
+            }
+            else if (transcript.includes('show clock') || transcript.includes('time')) {
+                openTab({currentTarget: document.querySelector('[data-tab="Clock"]')}, 'Clock');
+            }
+            
+            else {
+                showNotification('Command not recognized. Try "Set alarm for 7 AM" or "Start stopwatch"');
+            }
         }
         
         // --- NOTIFICATION FUNCTION ---
