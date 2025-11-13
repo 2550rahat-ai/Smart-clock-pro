@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Clock Pro - Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Default Dark Theme */
+            --bg-gradient-start: #0e1a35;
+            --bg-gradient-end: #172a4f;
+            --container-bg: rgba(18, 28, 53, 0.85);
+            --text-color: #e2e8f0;
+            --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --border-color: rgba(59, 130, 246, 0.3);
+            --input-bg: rgba(20, 30, 50, 0.7);
+            --item-bg: rgba(25, 35, 55, 0.6);
+            --danger-color: #f87171;
+            --edit-color: #fdba74;
+            --success-color: #4ade80;
+        }
+
+        body.light-theme {
+            --bg-gradient-start: #e0f2fe;
+            --bg-gradient-end: #bae6fd;
+            --container-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #0f172a;
+            --accent-color: #0ea5e9;
+            --accent-glow: rgba(14, 165, 233, 0.4);
+            --border-color: rgba(14, 165, 233, 0.4);
+            --input-bg: rgba(230, 245, 255, 0.8);
+            --item-bg: rgba(235, 245, 255, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: linear-gradient(45deg, var(--bg-gradient-start), var(--bg-gradient-end), #4f46e5, #c026d3);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+            margin: 0;
+            padding: 15px;
+            color: var(--text-color);
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--item-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            background: rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 4px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab-button {
+            padding: 12px 10px;
+            border: none; 
+            background: none; 
+            cursor: pointer;
+            font-size: 0.9rem; 
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.4s ease;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 70px;
+            opacity: 0.8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        
+        .tab-button i {
+            font-size: 1.1rem;
+        }
+        
+        .tab-button.active {
+            background-color: var(--accent-color);
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 0 15px var(--accent-glow);
+            opacity: 1;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active { 
+            display: block; 
+        }
+        
+        h2 { 
+            font-weight: 600; 
+            margin-bottom: 1.2rem; 
+            color: var(--accent-color); 
+            text-shadow: 0 0 5px var(--accent-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.4rem;
+        }
+
+        /* Clock Section */
+        #fullscreen-btn { 
+            position: absolute; 
+            top: 15px; 
+            left: 15px; 
+            background: var(--item-bg); 
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            opacity: 0.8; 
+            transition: opacity 0.3s; 
+            z-index: 10; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #digital-clock { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: clamp(2.2rem, 10vw, 3.2rem); 
+            color: var(--accent-color); 
+            text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow); 
+            margin: 1rem 0 0.5rem; 
+            text-align: center;
+        }
+        
+        #date { 
+            font-size: 1rem; 
+            opacity: 0.8; 
+            margin-bottom: 1.5rem; 
+            text-align: center;
+        }
+        
+        .analog-clock { 
+            width: 160px; 
+            height: 160px; 
+            border: 5px solid var(--accent-color); 
+            border-radius: 50%; 
+            margin: 1rem auto; 
+            position: relative; 
+            box-shadow: 0 0 20px var(--accent-glow); 
+            background-color: var(--input-bg); 
+        }
+        
+        .analog-clock .hand { 
+            position: absolute; 
+            bottom: 50%; 
+            left: 50%; 
+            transform-origin: bottom; 
+            background-color: var(--text-color); 
+        }
+        
+        .analog-clock .hour-hand { 
+            width: 6px; 
+            height: 40px; 
+            transform: translateX(-50%); 
+            border-radius: 4px; 
+        }
+        
+        .analog-clock .minute-hand { 
+            width: 4px; 
+            height: 55px; 
+            transform: translateX(-50%); 
+            border-radius: 3px; 
+        }
+        
+        .analog-clock .second-hand { 
+            width: 2px; 
+            height: 65px; 
+            transform: translateX(-50%); 
+            background-color: var(--danger-color); 
+            border-radius: 2px; 
+        }
+        
+        .analog-clock::after { 
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            width: 16px; 
+            height: 16px; 
+            background-color: var(--accent-color); 
+            border-radius: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 10; 
+            border: 3px solid var(--text-color); 
+        }
+
+        /* Form & Inputs */
+        .form-control { 
+            font-size: 1rem; 
+            background: var(--input-bg); 
+            color: var(--text-color); 
+            border: 2px solid var(--border-color); 
+            border-radius: 10px; 
+            padding: 14px; 
+            width: 100%; 
+            transition: all 0.3s; 
+        }
+        
+        .form-control:focus { 
+            outline: none; 
+            border-color: var(--accent-color); 
+            box-shadow: 0 0 10px var(--accent-glow); 
+        }
+        
+        .repeat-days { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            background: var(--input-bg); 
+            padding: 8px; 
+            border-radius: 10px; 
+        }
+        
+        .day-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .day-label input:checked + span { 
+            background-color: var(--accent-color); 
+            color: #fff; 
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 14px 20px; 
+            border: none; 
+            border-radius: 25px;
+            background: var(--accent-color); 
+            color: #fff;
+            font-size: 1rem; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--accent-glow);
+            text-shadow: 0 0 5px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--accent-glow), 0 0 30px var(--accent-glow);
+        }
+        
+        .btn-danger { 
+            background-color: var(--danger-color); 
+            box-shadow: 0 0 15px rgba(248, 113, 113, 0.5); 
+        }
+        
+        .btn-success { 
+            background-color: var(--success-color); 
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.5); 
+        }
+
+        /* Alarm Modal */
+        #alarm-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: opacity 0.4s ease, visibility 0.4s; 
+            padding: 20px;
+        }
+        
+        #alarm-modal.active { 
+            opacity: 1; 
+            visibility: visible; 
+        }
+        
+        .alarm-modal-content { 
+            background: var(--container-bg); 
+            padding: 2rem; 
+            border-radius: 18px; 
+            text-align: center; 
+            animation: zoomIn 0.4s ease forwards; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            border: 1px solid var(--border-color); 
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        @keyframes zoomIn { 
+            from { transform: scale(0.8); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
+        
+        #modal-time { 
+            font-size: 2.8rem; 
+            font-family: 'Orbitron'; 
+            margin-bottom: 1.5rem; 
+            color: var(--text-color); 
+            text-shadow: 0 0 15px var(--accent-glow); 
+        }
+        
+        /* Other styles */
+        .alarm-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            margin-top: 1.5rem; 
+            padding-right: 5px;
+        }
+        
+        .alarm-item { 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center; 
+            background: var(--item-bg); 
+            padding: 1rem; 
+            border-radius: 12px; 
+            border-left: 4px solid var(--accent-color); 
+            animation: slideIn 0.5s ease; 
+        }
+        
+        .alarm-details { 
+            text-align: left; 
+            flex: 1;
+        }
+        
+        .alarm-time { 
+            font-size: 1.3rem; 
+            font-weight: 600; 
+        }
+        
+        .alarm-label, .alarm-repeat { 
+            opacity: 0.8; 
+            font-size: 0.85rem; 
+        }
+        
+        .alarm-controls { 
+            display: flex;
+            gap: 5px;
+        }
+        
+        .alarm-controls button { 
+            background: none; 
+            border: none; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            padding: 8px; 
+            transition: all 0.3s; 
+            color: var(--text-color); 
+            border-radius: 5px;
+        }
+        
+        .alarm-controls .btn-edit:hover { 
+            color: var(--edit-color); 
+            background: rgba(253, 186, 116, 0.1);
+        }
+        
+        .alarm-controls .btn-delete:hover { 
+            color: var(--danger-color); 
+            background: rgba(248, 113, 113, 0.1);
+        }
+        
+        .timer-list { 
+            display: flex; 
+            flex-direction: column;
+            gap: 1rem; 
+            margin-top: 1rem; 
+        }
+        
+        .timer-instance { 
+            background: var(--item-bg); 
+            padding: 1.2rem; 
+            border-radius: 15px; 
+            text-align: center; 
+        }
+        
+        .timer-progress { 
+            position: relative; 
+            width: 130px; 
+            height: 130px; 
+            margin: 0 auto 1rem; 
+        }
+        
+        .timer-progress svg { 
+            width: 100%; 
+            height: 100%; 
+            transform: rotate(-90deg); 
+        }
+        
+        .progress-ring-bg { 
+            stroke: var(--border-color); 
+            stroke-width: 10; 
+            fill: transparent; 
+        }
+        
+        .progress-ring-fg { 
+            stroke: var(--accent-color); 
+            stroke-width: 10; 
+            fill: transparent; 
+            transition: stroke-dashoffset 1s linear; 
+            stroke-linecap: round; 
+        }
+        
+        .timer-display { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-family: 'Orbitron'; 
+            font-size: 1.5rem; 
+        }
+        
+        .timer-name { 
+            font-weight: 600; 
+            font-size: 1.1rem; 
+            margin-bottom: 0.8rem; 
+            color: var(--accent-color); 
+        }
+        
+        .timer-controls { 
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .timer-controls button { 
+            background: var(--input-bg); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-color); 
+            border-radius: 8px; 
+            padding: 8px 12px; 
+            cursor: pointer; 
+            flex: 1;
+            max-width: 100px;
+        }
+        
+        .form-group { 
+            margin-bottom: 1rem; 
+            text-align: left; 
+        }
+        
+        .day-label input { 
+            display: none; 
+        }
+        
+        .day-label span { 
+            padding: 8px; 
+            border-radius: 50%; 
+            width: 32px; 
+            height: 32px; 
+            display: inline-flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            font-size: 0.8rem;
+        }
+        
+        .time-inputs { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
+        .time-inputs .form-control {
+            text-align: center;
+        }
+        
+        /* New Stopwatch Styles */
+        .stopwatch-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-glow);
+            margin: 1.2rem 0;
+            text-align: center;
+        }
+        
+        .stopwatch-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stopwatch-controls .btn {
+            margin: 0;
+            flex: 1;
+            max-width: 110px;
+            padding: 12px;
+        }
+        
+        .lap-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            background: var(--item-bg);
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            padding: 1rem 1.2rem;
+            background: var(--container-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-left: 4px solid var(--accent-color);
+            transform: translateY(150%);
+            transition: transform 0.5s ease;
+            z-index: 1001;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+        
+        .notification.success {
+            border-left-color: var(--success-color);
+        }
+        
+        .notification.error {
+            border-left-color: var(--danger-color);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--input-bg);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+        
+        /* Weather Widget */
+        .weather-widget {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--item-bg);
+            border-radius: 10px;
+        }
+        
+        .weather-icon {
+            font-size: 1.5rem;
+        }
+        
+        .weather-temp {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .weather-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            background: var(--item-bg);
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Mobile-specific improvements */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .tab-button {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+                min-width: 60px;
+            }
+            
+            .tab-button i {
+                font-size: 1rem;
+            }
+            
+            .time-inputs {
+                flex-wrap: wrap;
+            }
+            
+            .time-inputs .form-control {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .repeat-days {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .day-label span {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .stopwatch-controls .btn {
+                max-width: 100px;
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .stopwatch-display {
+                font-size: 2.2rem;
+            }
+            
+            .timer-progress {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .timer-display {
+                font-size: 1.3rem;
+            }
+            
+            .alarm-modal-content {
+                padding: 1.5rem;
+            }
+            
+            #modal-time {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .tab-button {
+                min-width: 55px;
+                padding: 8px 5px;
+            }
+            
+            .stopwatch-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stopwatch-controls .btn {
+                max-width: 200px;
+                width: 100%;
+            }
+            
+            .repeat-days {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Prevent zoom on input focus for iOS */
+        @media screen and (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+    <div class="container">
+        <div class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </div>
+        
+        <button id="fullscreen-btn" onclick="toggleFullScreen()">
+            <i class="fas fa-expand"></i>
+        </button>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="Clock" onclick="openTab(event, 'Clock')">
+                <i class="fas fa-clock"></i> <span>Clock</span>
+            </button>
+            <button class="tab-button" data-tab="Alarm" onclick="openTab(event, 'Alarm')">
+                <i class="fas fa-bell"></i> <span>Alarm</span>
+            </button>
+            <button class="tab-button" data-tab="Timer" onclick="openTab(event, 'Timer')">
+                <i class="fas fa-hourglass-half"></i> <span>Timer</span>
+            </button>
+            <button class="tab-button" data-tab="Stopwatch" onclick="openTab(event, 'Stopwatch')">
+                <i class="fas fa-stopwatch"></i> <span>Stopwatch</span>
+            </button>
+            <button class="tab-button" data-tab="Settings" onclick="openTab(event, 'Settings')">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </button>
+        </div>
+
+        <div id="Clock" class="tab-content active">
+            <div id="clock-wrapper">
+                <div id="digital-clock"></div>
+                <div id="date"></div>
+                <div class="analog-clock">
+                    <div class="hand hour-hand" id="hour-hand"></div>
+                    <div class="hand minute-hand" id="minute-hand"></div>
+                    <div class="hand second-hand" id="second-hand"></div>
+                </div>
+                <div class="weather-widget" id="weather-widget">
+                    <i class="fas fa-cloud weather-icon"></i>
+                    <div>
+                        <div class="weather-temp">--°C</div>
+                        <div class="weather-desc">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Alarm" class="tab-content">
+            <h2><i class="fas fa-bell"></i> Set Alarm</h2>
+            <form id="alarm-form" onsubmit="handleAlarmFormSubmit(event)">
+                <input type="hidden" id="alarm-id">
+                <div class="form-group">
+                    <div class="time-inputs">
+                        <input type="number" id="alarm-hour" class="form-control" placeholder="HH" min="1" max="12" required>
+                        <input type="number" id="alarm-minute" class="form-control" placeholder="MM" min="0" max="59" required>
+                        <select id="alarm-ampm" class="form-control">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="alarm-label" class="form-control" placeholder="Label (e.g., Morning Exercise)">
+                </div>
+                <div class="form-group">
+                    <div class="repeat-days">
+                        <label class="day-label"><input type="checkbox" value="1"><span>Mon</span></label>
+                        <label class="day-label"><input type="checkbox" value="2"><span>Tue</span></label>
+                        <label class="day-label"><input type="checkbox" value="3"><span>Wed</span></label>
+                        <label class="day-label"><input type="checkbox" value="4"><span>Thu</span></label>
+                        <label class="day-label"><input type="checkbox" value="5"><span>Fri</span></label>
+                        <label class="day-label"><input type="checkbox" value="6"><span>Sat</span></label>
+                        <label class="day-label"><input type="checkbox" value="0"><span>Sun</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <select id="alarm-sound-select" class="form-control">
+                        <option value="sound1">Beep Tone</option>
+                        <option value="sound2">Bell Ring</option>
+                        <option value="sound3">Digital Tone</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="set-alarm-btn">
+                    <i class="fas fa-plus-circle"></i> Set Alarm
+                </button>
+            </form>
+            <div id="alarm-list" class="alarm-list"></div>
+        </div>
+
+        <div id="Timer" class="tab-content">
+            <h2><i class="fas fa-hourglass-half"></i> Create Timer</h2>
+            <form id="timer-form" onsubmit="handleTimerFormSubmit(event)">
+                <input type="text" id="timer-name" class="form-control" placeholder="Timer Name">
+                <div class="time-inputs">
+                    <input type="number" id="timer-hours" class="form-control" placeholder="HH" min="0" max="23">
+                    <input type="number" id="timer-minutes" class="form-control" placeholder="MM" min="0" max="59">
+                    <input type="number" id="timer-seconds" class="form-control" placeholder="SS" min="0" max="59">
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-plus-circle"></i> Add Timer
+                </button>
+            </form>
+            <div id="timer-list" class="timer-list"></div>
+        </div>
+        
+        <div id="Stopwatch" class="tab-content">
+            <h2><i class="fas fa-stopwatch"></i> Stopwatch</h2>
+            <div class="stopwatch-display" id="stopwatch-display">00:00:00.00</div>
+            <div class="stopwatch-controls">
+                <button class="btn btn-success" id="start-stopwatch">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button class="btn" id="lap-stopwatch">
+                    <i class="fas fa-flag"></i> Lap
+                </button>
+                <button class="btn btn-danger" id="reset-stopwatch">
+                    <i class="fas fa-stop"></i> Reset
+                </button>
+            </div>
+            <div class="lap-list" id="lap-list"></div>
+        </div>
+        
+        <div id="Settings" class="tab-content">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <div class="settings-panel">
+                <div class="setting-item">
+                    <span>Auto Theme</span>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-theme" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>24-hour Format</span>
+                    <label class="switch">
+                        <input type="checkbox" id="hour-format">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>Alarm Sound</span>
+                    <select id="default-alarm-sound" class="form-control" style="width: 150px;">
+                        <option value="sound1">Beep Tone</option>
+                        <option value="sound2">Bell Ring</option>
+                        <option value="sound3">Digital Tone</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span>Volume</span>
+                    <input type="range" id="volume-slider" min="0" max="100" value="80" class="form-control" style="width: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="alarm-modal">
+        <div class="alarm-modal-content">
+            <h2 id="modal-label">Alarm!</h2>
+            <div id="modal-time">00:00 AM</div>
+            <button class="btn btn-danger" onclick="stopAlarm()">
+                <i class="fas fa-stop"></i> Stop Alarm
+            </button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <div id="notification-message">Notification</div>
+    </div>
+
+    <!-- Audio elements with direct links to working sound files -->
+    <audio id="sound1" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/257/257-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="sound2" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/250/250-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="sound3" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/259/259-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="notification-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/250/250-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="timer-end-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/257/257-preview.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        const ALARMS_LS_KEY = 'smart_clock_alarms_v4';
+        const TIMERS_LS_KEY = 'smart_clock_timers_v4';
+        const SETTINGS_LS_KEY = 'smart_clock_settings_v4';
+        
+        let alarms = [];
+        let timers = [];
+        let settings = {
+            autoTheme: true,
+            hourFormat: false,
+            defaultAlarmSound: 'sound1',
+            volume: 80
+        };
+        let activeAlarmSound = null;
+        let activeTab = 'Clock';
+        
+        // Stopwatch variables
+        let stopwatchInterval = null;
+        let stopwatchTime = 0;
+        let stopwatchRunning = false;
+        let laps = [];
+        
+        const NOTIFICATION_SOUND = document.getElementById('notification-sound');
+        const TIMER_END_SOUND = document.getElementById('timer-end-sound');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            initializeSettings();
+            renderAlarms();
+            renderTimers();
+            updateClockAndTheme();
+            setInterval(updateClockAndTheme, 1000);
+            setInterval(checkAlarms, 1000);
+            setInterval(updateAllTimers, 1000);
+            updateWeather();
+            setInterval(updateWeather, 600000); // Update weather every 10 minutes
+            
+            // Preload all audio elements to ensure they work
+            preloadAudioElements();
+            
+            // Stopwatch event listeners
+            document.getElementById('start-stopwatch').addEventListener('click', toggleStopwatch);
+            document.getElementById('lap-stopwatch').addEventListener('click', recordLap);
+            document.getElementById('reset-stopwatch').addEventListener('click', resetStopwatch);
+            
+            // Settings event listeners
+            document.getElementById('auto-theme').addEventListener('change', updateSettings);
+            document.getElementById('hour-format').addEventListener('change', updateSettings);
+            document.getElementById('default-alarm-sound').addEventListener('change', updateSettings);
+            document.getElementById('volume-slider').addEventListener('input', updateSettings);
+            
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', toggleManualTheme);
+            
+            // Prevent default touch behaviors
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(e) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+
+        // Preload audio elements to ensure they work when needed
+        function preloadAudioElements() {
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.load();
+                // Set volume according to settings
+                audio.volume = settings.volume / 100;
+            });
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem(ALARMS_LS_KEY, JSON.stringify(alarms));
+            localStorage.setItem(TIMERS_LS_KEY, JSON.stringify(timers));
+            localStorage.setItem(SETTINGS_LS_KEY, JSON.stringify(settings));
+        }
+
+        function loadFromLocalStorage() {
+            alarms = JSON.parse(localStorage.getItem(ALARMS_LS_KEY)) || [];
+            timers = JSON.parse(localStorage.getItem(TIMERS_LS_KEY)) || [];
+            const savedSettings = JSON.parse(localStorage.getItem(SETTINGS_LS_KEY));
+            if (savedSettings) {
+                settings = { ...settings, ...savedSettings };
+            }
+        }
+        
+        function initializeSettings() {
+            document.getElementById('auto-theme').checked = settings.autoTheme;
+            document.getElementById('hour-format').checked = settings.hourFormat;
+            document.getElementById('default-alarm-sound').value = settings.defaultAlarmSound;
+            document.getElementById('volume-slider').value = settings.volume;
+            
+            // Update all audio elements volume
+            updateAudioVolume();
+        }
+        
+        function updateSettings() {
+            settings.autoTheme = document.getElementById('auto-theme').checked;
+            settings.hourFormat = document.getElementById('hour-format').checked;
+            settings.defaultAlarmSound = document.getElementById('default-alarm-sound').value;
+            settings.volume = document.getElementById('volume-slider').value;
+            
+            updateAudioVolume();
+            saveToLocalStorage();
+            showNotification('Settings updated successfully');
+        }
+        
+        function updateAudioVolume() {
+            const volume = settings.volume / 100;
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.volume = volume;
+            });
+        }
+        
+        function toggleManualTheme() {
+            settings.autoTheme = false;
+            document.getElementById('auto-theme').checked = false;
+            document.body.classList.toggle('light-theme');
+            document.getElementById('theme-toggle').innerHTML = document.body.classList.contains('light-theme') ? 
+                '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            saveToLocalStorage();
+        }
+
+        function openTab(evt, tabName) {
+            if (activeTab === tabName) return;
+            
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(tb => tb.classList.remove('active'));
+            
+            const activeContent = document.getElementById(tabName);
+            activeContent.classList.add('active');
+            evt.currentTarget.classList.add('active');
+            
+            // Re-trigger animation
+            activeContent.style.animation = 'none';
+            void activeContent.offsetWidth; // Trigger reflow
+            activeContent.style.animation = null; 
+            
+            activeTab = tabName;
+        }
+
+        function updateClockAndTheme() {
+            const now = new Date();
+            
+            // Update digital clock
+            let hours = now.getHours();
+            let ampm = '';
+            
+            if (settings.hourFormat) {
+                // 24-hour format
+                document.getElementById('digital-clock').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            } else {
+                // 12-hour format
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                document.getElementById('digital-clock').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} ${ampm}`;
+            }
+            
+            // Update date
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('date').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+            
+            // Update analog clock
+            const secondsRatio = now.getSeconds() / 60;
+            const minutesRatio = (secondsRatio + now.getMinutes()) / 60;
+            const hoursRatio = (minutesRatio + now.getHours()) / 12;
+            document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${secondsRatio * 360}deg)`;
+            document.getElementById('minute-hand').style.transform = `translateX(-50%) rotate(${minutesRatio * 360}deg)`;
+            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hoursRatio * 360}deg)`;
+            
+            // Update theme based on time if auto theme is enabled
+            if (settings.autoTheme) {
+                const currentHour = now.getHours();
+                if (currentHour >= 6 && currentHour < 18) {
+                    document.body.classList.add('light-theme');
+                    document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.body.classList.remove('light-theme');
+                    document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        // --- ALARM FUNCTIONS ---
+        function handleAlarmFormSubmit(event) {
+            event.preventDefault();
+            const id = document.getElementById('alarm-id').value;
+            const hour = parseInt(document.getElementById('alarm-hour').value);
+            const minute = parseInt(document.getElementById('alarm-minute').value);
+            const ampm = document.getElementById('alarm-ampm').value;
+            const label = document.getElementById('alarm-label').value || 'Alarm';
+            const sound = document.getElementById('alarm-sound-select').value;
+            const repeat = Array.from(document.querySelectorAll('.repeat-days input:checked')).map(el => parseInt(el.value));
+
+            if (hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+                showNotification('Please enter valid time values', 'error');
+                return;
+            }
+
+            if (id) {
+                const alarmIndex = alarms.findIndex(a => a.id == id);
+                alarms[alarmIndex] = { ...alarms[alarmIndex], hour, minute, ampm, label, sound, repeat };
+                showNotification('Alarm updated successfully');
+            } else {
+                alarms.push({ id: Date.now(), hour, minute, ampm, label, sound, repeat, active: true });
+                showNotification('Alarm set successfully');
+            }
+            saveToLocalStorage();
+            renderAlarms();
+            resetAlarmForm();
+            playNotificationSound();
+        }
+
+        function renderAlarms() {
+            const list = document.getElementById('alarm-list');
+            list.innerHTML = '';
+            
+            if (alarms.length === 0) {
+                list.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 2rem;">No alarms set</div>';
+                return;
+            }
+            
+            alarms.forEach(alarm => {
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const repeatText = alarm.repeat.length > 0 ? alarm.repeat.map(d => days[d]).join(', ') : 'Once';
+                list.innerHTML += `
+                    <div class="alarm-item">
+                        <div class="alarm-details">
+                            <div class="alarm-time">${String(alarm.hour).padStart(2,'0')}:${String(alarm.minute).padStart(2,'0')} ${alarm.ampm}</div>
+                            <div class="alarm-label">${alarm.label}</div>
+                            <div class="alarm-repeat">${repeatText}</div>
+                        </div>
+                        <div class="alarm-controls">
+                            <button class="btn-edit" onclick="editAlarm(${alarm.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="deleteAlarm(${alarm.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function editAlarm(id) {
+            const alarm = alarms.find(a => a.id === id);
+            document.getElementById('alarm-id').value = alarm.id;
+            document.getElementById('alarm-hour').value = alarm.hour;
+            document.getElementById('alarm-minute').value = alarm.minute;
+            document.getElementById('alarm-ampm').value = alarm.ampm;
+            document.getElementById('alarm-label').value = alarm.label;
+            document.getElementById('alarm-sound-select').value = alarm.sound;
+            document.querySelectorAll('.repeat-days input').forEach(el => {
+                el.checked = alarm.repeat.includes(parseInt(el.value));
+            });
+            document.getElementById('set-alarm-btn').innerHTML = '<i class="fas fa-save"></i> Update Alarm';
+            
+            // Scroll to form
+            document.getElementById('alarm-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteAlarm(id) {
+            if (confirm('Are you sure you want to delete this alarm?')) {
+                alarms = alarms.filter(a => a.id !== id);
+                saveToLocalStorage();
+                renderAlarms();
+                showNotification('Alarm deleted successfully');
+            }
+        }
+
+        function resetAlarmForm() {
+            document.getElementById('alarm-form').reset();
+            document.getElementById('alarm-id').value = '';
+            document.getElementById('set-alarm-btn').innerHTML = '<i class="fas fa-plus-circle"></i> Set Alarm';
+        }
+
+        function checkAlarms() {
+            const now = new Date();
+            const currentHour = now.getHours() % 12 || 12;
+            const currentMinute = now.getMinutes();
+            const currentAmpm = now.getHours() >= 12 ? 'PM' : 'AM';
+            const currentDay = now.getDay();
+            
+            alarms.forEach(alarm => {
+                if (alarm.active && alarm.hour === currentHour && alarm.minute === currentMinute && alarm.ampm === currentAmpm && now.getSeconds() === 0) {
+                    if (alarm.repeat.length === 0 || alarm.repeat.includes(currentDay)) {
+                        triggerAlarm(alarm);
+                        if (alarm.repeat.length === 0) {
+                            deleteAlarm(alarm.id);
+                        }
+                    }
+                }
+            });
+        }
+
+        function triggerAlarm(alarm) {
+            document.getElementById('modal-label').textContent = alarm.label;
+            document.getElementById('modal-time').textContent = `${String(alarm.hour).padStart(2,'0')}:${String(alarm.minute).padStart(2,'0')} ${alarm.ampm}`;
+            document.getElementById('alarm-modal').classList.add('active');
+            
+            // Play the alarm sound
+            playAlarmSound(alarm.sound);
+            
+            // Vibrate if supported
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 500]);
+            }
+        }
+        
+        function playAlarmSound(soundId) {
+            const sound = document.getElementById(soundId);
+            if (sound) {
+                activeAlarmSound = sound;
+                sound.currentTime = 0;
+                sound.play().catch(e => {
+                    console.error('Error playing alarm sound:', e);
+                    showNotification('Could not play alarm sound. Please check volume settings.', 'error');
+                });
+            }
+        }
+        
+        function playNotificationSound() {
+            NOTIFICATION_SOUND.currentTime = 0;
+            NOTIFICATION_SOUND.play().catch(e => {
+                console.error('Error playing notification sound:', e);
+            });
+        }
+
+        function stopAlarm() {
+            if (activeAlarmSound) {
+                activeAlarmSound.pause();
+                activeAlarmSound.currentTime = 0;
+            }
+            document.getElementById('alarm-modal').classList.remove('active');
+            
+            // Stop vibration
+            if (navigator.vibrate) {
+                navigator.vibrate(0);
+            }
+        }
+
+        // --- TIMER FUNCTIONS ---
+        function handleTimerFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('timer-name').value || 'Timer';
+            const hours = parseInt(document.getElementById('timer-hours').value) || 0;
+            const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            
+            if (totalSeconds <= 0) {
+                showNotification('Please enter a valid time duration', 'error');
+                return;
+            }
+
+            timers.push({ id: Date.now(), name, totalSeconds, remainingSeconds: totalSeconds, isRunning: true });
+            saveToLocalStorage();
+            renderTimers();
+            document.getElementById('timer-form').reset();
+            playNotificationSound();
+            showNotification('Timer added successfully');
+        }
+
+        function updateAllTimers() {
+            timers.forEach(timer => {
+                if (timer.isRunning && timer.remainingSeconds > 0) {
+                    timer.remainingSeconds--;
+                } else if (timer.isRunning && timer.remainingSeconds <= 0) {
+                    timer.isRunning = false;
+                    playTimerEndSound();
+                    showNotification(`Timer "${timer.name}" has finished!`);
+                    
+                    // Vibrate if supported
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200, 100, 200]);
+                    }
+                }
+            });
+            renderTimers();
+            saveToLocalStorage();
+        }
+        
+        function playTimerEndSound() {
+            TIMER_END_SOUND.currentTime = 0;
+            TIMER_END_SOUND.play().catch(e => {
+                console.error('Error playing timer end sound:', e);
+            });
+        }
+
+        function renderTimers() {
+            const list = document.getElementById('timer-list');
+            list.innerHTML = '';
+            
+            if (timers.length === 0) {
+                list.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 2rem;">No timers set</div>';
+                return;
+            }
+            
+            timers.forEach(timer => {
+                const totalHours = Math.floor(timer.remainingSeconds / 3600);
+                const totalMinutes = Math.floor((timer.remainingSeconds % 3600) / 60);
+                const totalSeconds = timer.remainingSeconds % 60;
+                
+                let displayTime;
+                if (totalHours > 0) {
+                    displayTime = `${String(totalHours).padStart(2, '0')}:${String(totalMinutes).padStart(2, '0')}:${String(totalSeconds).padStart(2, '0')}`;
+                } else {
+                    displayTime = `${String(totalMinutes).padStart(2, '0')}:${String(totalSeconds).padStart(2, '0')}`;
+                }
+                
+                const progress = timer.totalSeconds > 0 ? (timer.totalSeconds - timer.remainingSeconds) / timer.totalSeconds : 0;
+                const radius = 54;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference * (1 - progress);
+                
+                list.innerHTML += `
+                    <div class="timer-instance">
+                        <div class="timer-name">${timer.name}</div>
+                        <div class="timer-progress">
+                            <svg><circle class="progress-ring-bg" r="${radius}" cx="75" cy="75" /><circle class="progress-ring-fg" r="${radius}" cx="75" cy="75" style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset};"/></svg>
+                            <div class="timer-display">${displayTime}</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button onclick="toggleTimer(${timer.id})">${timer.isRunning ? 'Pause' : 'Resume'}</button>
+                            <button onclick="deleteTimer(${timer.id})">Delete</button>
+                        </div>
+                    </div>`;
+            });
+        }
+        
+        function toggleTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer.remainingSeconds > 0) {
+                timer.isRunning = !timer.isRunning;
+                showNotification(`Timer "${timer.name}" ${timer.isRunning ? 'resumed' : 'paused'}`);
+            }
+            saveToLocalStorage();
+            renderTimers();
+        }
+        
+        function deleteTimer(id) {
+            if (confirm('Are you sure you want to delete this timer?')) {
+                timers = timers.filter(t => t.id !== id);
+                saveToLocalStorage();
+                renderTimers();
+                showNotification('Timer deleted successfully');
+            }
+        }
+        
+        // --- STOPWATCH FUNCTIONS ---
+        function toggleStopwatch() {
+            const startBtn = document.getElementById('start-stopwatch');
+            
+            if (!stopwatchRunning) {
+                // Start the stopwatch
+                stopwatchRunning = true;
+                startBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                startBtn.classList.remove('btn-success');
+                startBtn.classList.add('btn-danger');
+                
+                const startTime = Date.now() - stopwatchTime;
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime = Date.now() - startTime;
+                    updateStopwatchDisplay();
+                }, 10);
+            } else {
+                // Pause the stopwatch
+                stopwatchRunning = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                startBtn.classList.remove('btn-danger');
+                startBtn.classList.add('btn-success');
+                clearInterval(stopwatchInterval);
+            }
+        }
+        
+        function updateStopwatchDisplay() {
+            const hours = Math.floor(stopwatchTime / 3600000);
+            const minutes = Math.floor((stopwatchTime % 3600000) / 60000);
+            const seconds = Math.floor((stopwatchTime % 60000) / 1000);
+            const milliseconds = Math.floor((stopwatchTime % 1000) / 10);
+            
+            document.getElementById('stopwatch-display').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
+        }
+        
+        function recordLap() {
+            if (!stopwatchRunning) return;
+            
+            const hours = Math.floor(stopwatchTime / 3600000);
+            const minutes = Math.floor((stopwatchTime % 3600000) / 60000);
+            const seconds = Math.floor((stopwatchTime % 60000) / 1000);
+            const milliseconds = Math.floor((stopwatchTime % 1000) / 10);
+            
+            const lapTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
+            
+            laps.unshift({
+                number: laps.length + 1,
+                time: lapTime,
+                totalTime: stopwatchTime
+            });
+            
+            renderLaps();
+            playNotificationSound();
+        }
+        
+        function renderLaps() {
+            const lapList = document.getElementById('lap-list');
+            lapList.innerHTML = '';
+            
+            if (laps.length === 0) {
+                lapList.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 1rem;">No laps recorded</div>';
+                return;
+            }
+            
+            laps.forEach(lap => {
+                const lapItem = document.createElement('div');
+                lapItem.className = 'lap-item';
+                lapItem.innerHTML = `
+                    <span>Lap ${lap.number}</span>
+                    <span>${lap.time}</span>
+                `;
+                lapList.appendChild(lapItem);
+            });
+        }
+        
+        function resetStopwatch() {
+            if (confirm('Are you sure you want to reset the stopwatch? All laps will be cleared.')) {
+                stopwatchRunning = false;
+                stopwatchTime = 0;
+                laps = [];
+                
+                clearInterval(stopwatchInterval);
+                document.getElementById('start-stopwatch').innerHTML = '<i class="fas fa-play"></i> Start';
+                document.getElementById('start-stopwatch').classList.remove('btn-danger');
+                document.getElementById('start-stopwatch').classList.add('btn-success');
+                
+                updateStopwatchDisplay();
+                renderLaps();
+            }
+        }
+        
+        // --- WEATHER FUNCTIONS ---
+        function updateWeather() {
+            // In a real application, you would fetch weather data from an API
+            // For this demo, we'll simulate weather data
+            
+            const weatherWidget = document.getElementById('weather-widget');
+            const tempElement = weatherWidget.querySelector('.weather-temp');
+            const descElement = weatherWidget.querySelector('.weather-desc');
+            const iconElement = weatherWidget.querySelector('.weather-icon');
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Simulated weather data
+                const temperatures = [22, 23, 24, 25, 26, 27];
+                const conditions = [
+                    { icon: 'fa-sun', desc: 'Sunny' },
+                    { icon: 'fa-cloud', desc: 'Cloudy' },
+                    { icon: 'fa-cloud-sun', desc: 'Partly Cloudy' },
+                    { icon: 'fa-cloud-rain', desc: 'Light Rain' }
+                ];
+                
+                const randomTemp = temperatures[Math.floor(Math.random() * temperatures.length)];
+                const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+                
+                tempElement.textContent = `${randomTemp}°C`;
+                descElement.textContent = randomCondition.desc;
+                iconElement.className = `fas ${randomCondition.icon} weather-icon`;
+            }, 1000);
+        }
+        
+        // --- NOTIFICATION FUNCTION ---
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageElement = document.getElementById('notification-message');
+            
+            messageElement.textContent = message;
+            notification.className = 'notification';
+            notification.classList.add(type, 'show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
